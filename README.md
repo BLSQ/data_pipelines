@@ -2,10 +2,10 @@
 
 The data pipelines are the generic data transformation and modeling tools we develop and use accross projects. We have four main pipelines as of now:
 
-*Data Mapping*
+* __Data Mapping__
 
-*Data Processing*
+* __Data Processing__
 
-*Data Modeling*
+* __Data Modeling__
 
-*Data Vizualization*
+* __Data Vizualization__
