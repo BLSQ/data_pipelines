@@ -1,0 +1,8 @@
+
+*.csv
+
+\.DS_Store
+
+src/__pycache__/
+
+src/audit/__pycache__/
