@@ -1,0 +1,5 @@
+Pipelines
+==========================================
+
+.. toctree::
+    pipelines/audit
