@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+  <title>General Description</title>
+
+  <link rel="stylesheet" href="_static/sphinx-modern-theme.css" type="text/css"/>
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+</head>
+<body>
+<div class="container">
+  <div class="row" style="margin-top: 1rem;">
+    <div id="sidebar" class="col-xs-12 col-sm-3">
+      <a href="index.html">
+        <img style="margin-bottom: 0.5rem;" class="img-fluid" src="_static/logo.png"/>
+      </a>
+      <div id="searchbox" style="display: none" role="search">
+        <form class="form-inline" action="search.html" method="get">
+          <div class="form-group">
+            <label class="sr-only" for="searchInput">Search</label>
+            <input type="text" class="form-control" name="q" id="searchInput" placeholder="Search">
+          </div>
+          <button type="submit" class="btn btn-secondary" style="display:none">Go</button>
+          <input type="hidden" name="check_keywords" value="yes"/>
+          <input type="hidden" name="area" value="default"/>
+        </form>
+      </div>
+
+      <hr>
+
+      <div id="toc">
+        <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">General Description</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-pipelines">Data Pipelines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-blocks">Building Blocks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#projects">Projects</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines.html">Pipelines</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipelines/audit.html">Data Audit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pipelines/audit.html">Data Audit</a></li>
+</ul>
+
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9">
+      <div class="section" id="general-description">
+<h1>General Description<a class="headerlink" href="#general-description" title="Permalink to this headline">¶</a></h1>
+<p>Our work is organized around three main dimensions:
+* Pipelines of data processing in which we develop and organized our data sciences methods.
+* Building blocks in which we adapt our processes to our specific knowledge of health systems and health issues in developing countries.
+* Projects in which we combine pipelines from different building blocks, and add custom work for a specific objective and outcome.</p>
+<p>For example, our work on data auditing and data modeling allows gives us a good understanding of how to analyze and represent HMIS data availability for patients care and logistical systems, which we will implement in many of our project, with some adaptation regarding the subjects we are more interested in (HIV, family planning…)</p>
+<div class="section" id="data-pipelines">
+<h2>Data Pipelines<a class="headerlink" href="#data-pipelines" title="Permalink to this headline">¶</a></h2>
+<p>Pipelines are the generic manipulation we are doing in most of the project we are working. They are our core toolbox, and are developed overtime when we have to process data for different purposes. We are currently organized around five  main pipelines.</p>
+<div class="section" id="data-audit">
+<h3>Data Audit<a class="headerlink" href="#data-audit" title="Permalink to this headline">¶</a></h3>
+<p>In this pipeline we work on understanding what a data source includes, and what can or can’t be done with it. Most of the HMIS data we work with includes hundreds of indicators, measured over time in thousands of facilities. We develop a generic approach and tools to assess data quality, and explore possible usages and potential shortcomings, even before we start comprehensively processing the data.</p>
+</div>
+<div class="section" id="data-mapping">
+<h3>Data Mapping<a class="headerlink" href="#data-mapping" title="Permalink to this headline">¶</a></h3>
+<p>Because we do a lot of data compiling from different sources, we need to map those sources between them (indicators, orgUnits…), mapping indicators with concepts etc… This includes some help for manual integration, and some machine learning approach for automating burdensome tasks.</p>
+</div>
+<div class="section" id="data-transform">
+<h3>Data Transform<a class="headerlink" href="#data-transform" title="Permalink to this headline">¶</a></h3>
+<p>Once data has been identified and mapped, we need to transform it before it is modeled. Due to type of real life data we use, this is a really not trivial line of work. This includes data sources reconciliation, data imputation, data selection…</p>
+</div>
+<div class="section" id="data-modeling">
+<h3>Data Modeling<a class="headerlink" href="#data-modeling" title="Permalink to this headline">¶</a></h3>
+<p>The data modeling is all the analytical work we want to do with the data to produce some value. This includes building composite indicators, any kind of statistical modeling or learning we are doing on a routine basis and want to replicate across different projects because it is good.</p>
+</div>
+<div class="section" id="data-visualization">
+<h3>Data Visualization<a class="headerlink" href="#data-visualization" title="Permalink to this headline">¶</a></h3>
+<p>Finally, we have to format outputs to fit both the needs of our clients, and the tools we use to communicate or present our work. This includes graphs, shiny apps, notebooks…</p>
+</div>
+</div>
+<div class="section" id="building-blocks">
+<h2>Building Blocks<a class="headerlink" href="#building-blocks" title="Permalink to this headline">¶</a></h2>
+<p>Building blocks are the different domains of analysis we are interested in investigating. For each of the pipelines, some of the processes have different approaches depending on the building blocks they refer to. For example, when working on HIV data, the way we impute missing data for a number of active patients on ART will be different from how we impute data on ART stocks.</p>
+<div class="section" id="patients-visits">
+<h3>Patients visits<a class="headerlink" href="#patients-visits" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="health-inputs">
+<h3>Health inputs<a class="headerlink" href="#health-inputs" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="infrastructure">
+<h3>Infrastructure<a class="headerlink" href="#infrastructure" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="human-resources">
+<h3>Human Resources<a class="headerlink" href="#human-resources" title="Permalink to this headline">¶</a></h3>
+<div class="admonition-todo admonition" id="index-0">
+<p class="first admonition-title">Todo</p>
+<p class="last">Add diagram to illustrate pipeline x blocks Matrix</p>
+</div>
+</div>
+</div>
+<div class="section" id="projects">
+<h2>Projects<a class="headerlink" href="#projects" title="Permalink to this headline">¶</a></h2>
+<div class="admonition-todo admonition" id="index-1">
+<p class="first admonition-title">Todo</p>
+<p class="last">Add links to projects outputs or notebooks.</p>
+</div>
+</div>
+</div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"
+        integrity="sha384-THPy051/pYDQGanwU6poAc/hOdQxjnOEXzbT+OuUAFqNqFjL+4IGLBgCJC3ZOShY"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.2.0/js/tether.min.js"
+        integrity="sha384-Plbmg8JY28KFelvJVai01l8WyZzrYWG825m+cZ0eDDS1f7d/js6ikvy1+X+guPIB"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.3/js/bootstrap.min.js"
+        integrity="sha384-ux8v3A6CPtOTqOzMKiuo3d/DomGaaClxFYdCu2HPMBEkf6x2xiDyJ7gkXU0MWwaD"
+        crossorigin="anonymous"></script>
+<script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lunr.js/0.6.0/lunr.min.js"></script>
+<script src="_static/searchtools.js"></script>
+<script>$('#searchbox').show(0)</script>
+</body>
+</html>

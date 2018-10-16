@@ -1,14 +1,15 @@
 .. Bluesquare Data Pipelines documentation master file
 
-Welcome to Bluesquare Data Pipelines's documentation!
+Data Pipelines at Bluesquare
 =====================================================
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
-   introduction/pipelines
-   introduction/building_blocks
+
+   introduction
+
 
    pipelines
    pipelines/audit
