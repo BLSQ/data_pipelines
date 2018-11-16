@@ -1,7 +1,7 @@
 """Builds a preferred serie on a given thematics from multiple series."""
 
 import pandas as pd
-from scipy.interpolate import interp1d
+from scipy.interpolate import CubicSpline
 
 
 class measured_serie(object):
@@ -46,20 +46,29 @@ class measured_serie(object):
             out = self.data_list[self.preferred_source]
             out['source'] = self.preferred_source
         if (len(full_time) > len(out)) & (fill_gaps is True):
+            sources.remove(self.preferred_source)
             for source in sources:
-                remaining = [x for x in full_time if x not in out]
-                add_dat = self.data_list[source][self.data_list.monthly.isin(remaining)]
+                remaining = [x for x in full_time if x not in list(out.monthly)]
+                add_dat = self.data_list[source][self.data_list[source].monthly.isin(remaining)]
                 add_dat['source'] = source
                 out = out.append(add_dat)
         self.preferred_serie = out
 
     def impute_missing(self, full_range):
-        """Imputes the number of patients for missing monthes of data"""
-        allmonths = pd.date_range(full_range[0], full_range=1,
-                                  freq='MS').strftime("%Y-%b").tolist()
+        """Imputes the number of patients for missing monthes of data."""
+        allmonths = pd.DataFrame(pd.date_range(full_range[0], full_range[1],
+                                 freq='MS'), columns=['all_months_id'])
+        allmonths['month_order'] = allmonths.all_months_id.rank()
+        allmonths['all_months'] = allmonths.all_months_id.dt.strftime("%Y-%b")
+        self.preferred_serie['month'] = pd.to_datetime(self.preferred_serie.monthly, format="%Y%m").dt.strftime("%Y-%b")
+        all_data = pd.merge(self.preferred_serie, allmonths, how='outer', left_on='month', right_on='all_months')
+        all_data = all_data.sort_values('month_order')
+
+        #y_to_spline = all_data['value']
+        #spliner = CubicSpline(all_data['month_order'], y_to_spline, extrapolate = True)
         #self.preferred_serie.month =
 
-        return self
+        return all_data
 
     def benchmark_serie(self):
         return self
