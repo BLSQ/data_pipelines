@@ -24,9 +24,9 @@ class dhis_instance(object):
 
     """
 
-    def __init__(self, dbname, user, host):
+    def __init__(self, dbname, user, host, password):
         """Create a dhis instance."""
-        connecting = "dbname='" + dbname + "' user='" + user + "' host='" + host + "'"
+        connecting = "dbname='" + dbname + "' user='" + user + "' host='" + host + "' password='" + password + "'"
         try:
             self.connexion = pypg.connect(connecting)
         except:
