@@ -63,12 +63,14 @@ class measured_serie(object):
         self.preferred_serie['month'] = pd.to_datetime(self.preferred_serie.monthly, format="%Y%m").dt.strftime("%Y-%b")
         all_data = pd.merge(self.preferred_serie, allmonths, how='outer', left_on='month', right_on='all_months')
         all_data = all_data.sort_values('month_order')
+        print(all_data)
+        fit_data = all_data.dropna()
+        spliner = CubicSpline(fit_data['month_order'], fit_data['value'],
+                              bc_type = 'natural',
+                              extrapolate=None)
 
-        #y_to_spline = all_data['value']
-        #spliner = CubicSpline(all_data['month_order'], y_to_spline, extrapolate = True)
-        #self.preferred_serie.month =
 
-        return all_data
+        return [fit_data, spliner]
 
     def benchmark_serie(self):
         return self
