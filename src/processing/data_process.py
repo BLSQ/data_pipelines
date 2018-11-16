@@ -2,6 +2,7 @@
 
 import pandas as pd
 from scipy.interpolate import CubicSpline
+import numpy as np
 
 
 class measured_serie(object):
@@ -54,23 +55,41 @@ class measured_serie(object):
                 out = out.append(add_dat)
         self.preferred_serie = out
 
-    def impute_missing(self, full_range):
+    def missingness_imputation(self, data, full_range):
         """Imputes the number of patients for missing monthes of data."""
         allmonths = pd.DataFrame(pd.date_range(full_range[0], full_range[1],
                                  freq='MS'), columns=['all_months_id'])
         allmonths['month_order'] = allmonths.all_months_id.rank()
-        allmonths['all_months'] = allmonths.all_months_id.dt.strftime("%Y-%b")
-        self.preferred_serie['month'] = pd.to_datetime(self.preferred_serie.monthly, format="%Y%m").dt.strftime("%Y-%b")
-        all_data = pd.merge(self.preferred_serie, allmonths, how='outer', left_on='month', right_on='all_months')
+        allmonths['month'] = allmonths.all_months_id.dt.strftime("%Y-%b")
+        data['month'] = pd.to_datetime(data.monthly, format="%Y%m").dt.strftime("%Y-%b")
+        all_data = pd.merge(data, allmonths, how='outer', left_on='month', right_on='month')
         all_data = all_data.sort_values('month_order')
-        print(all_data)
         fit_data = all_data.dropna()
         spliner = CubicSpline(fit_data['month_order'], fit_data['value'],
                               bc_type = 'natural',
-                              extrapolate=None)
+                              extrapolate=True)
+        add_data = all_data[pd.isna(all_data.monthly)]
+        add_data.value = spliner(add_data.month_order, extrapolate=True)
+        add_data.source = 'imputation'
+        out = fit_data.append(add_data)
+        return out
 
+    def format_monthly(self, monthly):
+        monthly = monthly[0:4] + '-' + monthly[4:6]
+        return monthly
 
-        return [fit_data, spliner]
+    def impute_missing(self, full_range):
+        data = self.preferred_serie
+        self.imputed_serie = self.missingness_imputation(data, full_range)
 
-    def benchmark_serie(self):
-        return self
+    def benchmark_serie(self, train_perc=.75):
+        data = self.preferred_serie.sample(frac=train_perc)
+        full_range = [self.format_monthly(min(data.monthly)),
+                      self.format_monthly(max(data.monthly))]
+        imputed_serie = self.missingness_imputation(data, full_range)
+        benchmark_data = self.preferred_serie.merge(imputed_serie, on = 'month', suffixes = ['' , '_imputed'])
+        benchmark_data.value = pd.to_numeric(benchmark_data.value)
+        benchmark_data.value_imputed = pd.to_numeric(benchmark_data.value_imputed)
+        #rmse = benchmark_data.value - benchmark_data.value_imputed
+        name = np.mean(abs(benchmark_data.value - benchmark_data.value_imputed) / np.mean(benchmark_data.value))
+        return benchmark_data
