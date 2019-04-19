@@ -41,7 +41,7 @@ def make_full_data_expectations(data_elements_sets, org_units_sets, full_de_cc, 
 def aggr_expectation(full_expectation, space):
     if type(space) == str:
         space = [space]
-    de_expectation = expectation_full.groupby(space + ['dataElement_id'])['n_values'].sum().reset_index()
+    de_expectation = full_expectation.groupby(space + ['dataElement_id'])['n_values'].sum().reset_index()
     de_expectation.columns = space + ['dataElement_id', 'n_expected']
     return de_expectation
 

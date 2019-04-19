@@ -23,14 +23,16 @@ class measured_serie(object):
 
     """
 
-    def __init__(self, data_list, data_type, preferred_source = ""):
-        # TODO Check if preferred source is in the data list
-        self.data_list = data_list
-        self.data_type = data_type
+    def __init__(self, data_frame, config, activity, state, preferred_source=""):
+        """Set up a serie object based on data and a configuration json."""
+        self.sources = list(config['activities'][activity]['states'][state]['sources'].keys())
         self.preferred_source = preferred_source
+        # TODO Check if preferred source is in the data list
+        self.series = [activity + state + sources for sources in self.sources]
 
     def reconcile_series(self, prefer_threshold=2, fill_gaps=True):
-        # Question1 : we may not want to fill the gaps with not preferred values. leave it as a parameter.
+        # Question1 : we may not want to fill the gaps with not preferred values.
+        # leave it as a parameter.
         # Question2 : have benchmarking metrics
         """Build a unique data series from multiple data sources."""
         sources = list(self.data_list.keys())
@@ -77,6 +79,16 @@ class measured_serie(object):
     def format_monthly(self, monthly):
         monthly = monthly[0:4] + '-' + monthly[4:6]
         return monthly
+
+# Take out outlier
+#
+
+
+# Make data trimestre:
+    # si on a une valuer au dernier mois : garde
+    # si on a pas de valeur au dernier mois :
+        # si on a une a pas de value rans le trimesttre : missing
+        # si on a une valuer dans le trimestre : derniere
 
     def impute_missing(self, full_range):
         data = self.preferred_serie
