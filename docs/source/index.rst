@@ -5,14 +5,11 @@ Data Pipelines at Bluesquare
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Content:
 
 
    introduction
-
-
    pipelines
-   pipelines/audit
 
 Indices and tables
 ==================
