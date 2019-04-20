@@ -1,4 +1,3 @@
-#%%
 """Read a DHIS database and prepare its content for analysis."""
 import pandas as pd
 import psycopg2 as pypg
@@ -108,9 +107,3 @@ class dhis_instance(object):
                                                                 left_on=uid,
                                                                 right_on='uid')
         self.orgunitstructure = self.orgunitstructure[['organisationunituid', 'level'] + uids + ['namelevel'+x[-1] for x in uids]]
-
-
-
-dhis_instance("dhis2_cd_hivdr_prod")
-
-#%%
