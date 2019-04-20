@@ -1,1 +1,1 @@
-from dhis import dhis_instance
+from .dhis import dhis_instance
