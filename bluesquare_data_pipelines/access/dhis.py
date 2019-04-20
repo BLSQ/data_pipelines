@@ -1,17 +1,17 @@
+#%%
 """Read a DHIS database and prepare its content for analysis."""
 import pandas as pd
 import psycopg2 as pypg
-
+from pathlib import Path
+from dotenv import dotenv_values
 
 class dhis_instance(object):
     """Information and metadata about a given DHIS instance.
-
     Parameters
     ----------
     dbname: The name of the database
     user: The user name used to access the database
     host: The server on which the database is hosted
-
     Attributes
     ----------
     organisationunit: DataFrame
@@ -20,16 +20,11 @@ class dhis_instance(object):
         Names and IDs of data elements in the DHIS
     orgunitstructure: DataFrame
         The hierarchical structure of the DHIS organisation units
-
     """
 
-    def __init__(self, dbname, user, host, password):
+    def __init__(self, credentials):
         """Create a dhis instance."""
-        connecting = "dbname='" + dbname + "' user='" + user + "' host='" + host + "' password='" + password + "'"
-        try:
-            self.connexion = pypg.connect(connecting)
-        except:
-            print("Failed connection")
+        self.dhis_connect(credentials)
         self.organisationunit = pd.read_sql_query("SELECT organisationunitid, uid, name, path FROM organisationunit;",
                                                   self.connexion)
         self.dataelement = pd.read_sql_query("SELECT uid, name, dataelementid, categorycomboid FROM dataelement;", self.connexion)
@@ -42,9 +37,16 @@ class dhis_instance(object):
         self.periods = pd.read_sql_query("SELECT *  FROM _periodstructure;",
                                          self.connexion)
         self.label_org_unit_structure()
-        # TODO : should find a way to store the data access info securely
-        # so we don't have to keep attributes we only use for very
-        # specific usages (ex: categoryoptioncombo)
+
+    def dhis_connect(self, credentials):
+        fromPath = Path.home() / '.credentials'
+        env_path = (fromPath / ("dhis2_cd_hivdr_prod")).resolve()
+        loaded = dotenv_values(dotenv_path=str(env_path))
+        connecting = "dbname='" + loaded["dbname"] + "' user='" + loaded["user"] + "' host='" + loaded["host"] + "' password='" + loaded["password"] + "'"
+        try:
+            self.connexion = pypg.connect(connecting)
+        except:
+            print("Failed connection")
 
     def build_de_cc_table(self):
         """Build table in which category combos are linked to data elements."""
@@ -62,7 +64,7 @@ class dhis_instance(object):
         reported_de = reported_de.merge(self.organisationunit,
                                         left_on='uidlevel3', right_on='uid',
                                         how='inner')
-        reported_de = reported_de.merge(self.dataelement,
+        reported_de = reported_de.merge(self.dataelement, 
                                         left_on='dataelementid',
                                         right_on='dataelementid',
                                         suffixes=['_orgUnit', '_data_element'])
@@ -81,7 +83,7 @@ class dhis_instance(object):
                                'count',
                                'uid_data_element', 'name_data_element']
         return reported_de
-
+        
     def get_data(self, de_ids, ou_ids):
         # TODO : allow tailored reported values extraction
         """Extract data reported for each data elements."""
@@ -89,7 +91,6 @@ class dhis_instance(object):
         ous = "('" + "','".join(ou_ids) + "')"
         data = pd.read_sql_query("SELECT datavalue.value, _orgunitstructure.uidlevel3, _orgunitstructure.uidlevel2, _periodstructure.enddate, _periodstructure.monthly, _periodstructure.quarterly, dataelement.uid AS dataelementid, dataelement.name AS dataelementname, categoryoptioncombo.uid AS CatComboID , categoryoptioncombo.name AS CatComboName,dataelement.created, organisationunit.uid as uidorgunit FROM datavalue JOIN _orgunitstructure ON _orgunitstructure.organisationunitid = datavalue.sourceid JOIN _periodstructure ON _periodstructure.periodid = datavalue.periodid JOIN dataelement ON dataelement.dataelementid = datavalue.dataelementid JOIN categoryoptioncombo ON categoryoptioncombo.categoryoptioncomboid = datavalue.categoryoptioncomboid JOIN organisationunit ON organisationunit.organisationunitid = datavalue.sourceid WHERE dataelement.uid IN " + des + " AND organisationunit.uid IN " + ous + ";", self.connexion)
         return data
-
 
     def label_org_unit_structure(self):
         """Label the Organisation Units Structure table."""
@@ -107,3 +108,9 @@ class dhis_instance(object):
                                                                 left_on=uid,
                                                                 right_on='uid')
         self.orgunitstructure = self.orgunitstructure[['organisationunituid', 'level'] + uids + ['namelevel'+x[-1] for x in uids]]
+
+
+
+dhis_instance("dhis2_cd_hivdr_prod")
+
+#%%
