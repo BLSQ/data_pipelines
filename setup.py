@@ -1,3 +1,4 @@
+#%%
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -12,10 +13,12 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/BLSQ/data_pipelines",
-    packages=setuptools.find_packages(),
+    packages=[bluesquare_data_pipelines, bluesquare_data_pipelines.access],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
 )
+
+#%%
