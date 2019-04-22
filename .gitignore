@@ -3,8 +3,6 @@
 
 \.DS_Store
 
-src/__pycache__/
-
-src/audit/__pycache__/
-
 notebooks/\.ipynb_checkpoints/
+
+*__pycache__
