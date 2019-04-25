@@ -3,6 +3,8 @@ import pandas as pd
 import psycopg2 as pypg
 from pathlib import Path
 from dotenv import dotenv_values
+import datetime as dt
+import csv as csv
 
 class dhis_instance(object):
     """Information and metadata about a given DHIS instance.
@@ -83,12 +85,25 @@ class dhis_instance(object):
                                'uid_data_element', 'name_data_element']
         return reported_de
         
-    def get_data(self, de_ids, ou_ids):
+    def get_data(self, de_ids, ou_ids, yearly=None, comment = ""):
         # TODO : allow tailored reported values extraction
         """Extract data reported for each data elements."""
+        today = dt.datetime.now().strftime("%Y-%m-%d %H:%M")
+        periods = []
         des = "('" + "','".join(de_ids) + "')"
         ous = "('" + "','".join(ou_ids) + "')"
-        data = pd.read_sql_query("SELECT datavalue.value, _orgunitstructure.uidlevel3, _orgunitstructure.uidlevel2, _periodstructure.enddate, _periodstructure.monthly, _periodstructure.quarterly, dataelement.uid AS dataelementid, dataelement.name AS dataelementname, categoryoptioncombo.uid AS CatComboID , categoryoptioncombo.name AS CatComboName,dataelement.created, organisationunit.uid as uidorgunit FROM datavalue JOIN _orgunitstructure ON _orgunitstructure.organisationunitid = datavalue.sourceid JOIN _periodstructure ON _periodstructure.periodid = datavalue.periodid JOIN dataelement ON dataelement.dataelementid = datavalue.dataelementid JOIN categoryoptioncombo ON categoryoptioncombo.categoryoptioncomboid = datavalue.categoryoptioncomboid JOIN organisationunit ON organisationunit.organisationunitid = datavalue.sourceid WHERE dataelement.uid IN " + des + " AND organisationunit.uid IN " + ous + ";", self.connexion)
+        query = "SELECT datavalue.value, _orgunitstructure.uidlevel3, _orgunitstructure.uidlevel2, _periodstructure.enddate, _periodstructure.monthly, _periodstructure.quarterly, dataelement.uid AS dataelementid, dataelement.name AS dataelementname, categoryoptioncombo.uid AS CatComboID , categoryoptioncombo.name AS CatComboName,dataelement.created, organisationunit.uid as uidorgunit FROM datavalue JOIN _orgunitstructure ON _orgunitstructure.organisationunitid = datavalue.sourceid JOIN _periodstructure ON _periodstructure.periodid = datavalue.periodid JOIN dataelement ON dataelement.dataelementid = datavalue.dataelementid JOIN categoryoptioncombo ON categoryoptioncombo.categoryoptioncomboid = datavalue.categoryoptioncomboid JOIN organisationunit ON organisationunit.organisationunitid = datavalue.sourceid WHERE dataelement.uid IN " + des + " AND organisationunit.uid IN " + ous
+        if yearly is not None :
+            periods = self.periods.periodid[self.periods.yearly == str(yearly)].tolist()
+            periods = [str(x) for x in periods]
+            period_query =  " AND datavalue.periodid IN " + "('" + "','".join(periods) + "')"
+            query = query + period_query
+        data = pd.read_sql_query(query + ";", self.connexion)
+        log = [today, de_ids, ou_ids, periods]
+        with open('data/logs/extraction_log.csv', 'a+', newline='') as extraction_log:
+                fieldnames = ['date','de_ids', 'ou_ids', 'periods', 'comment']
+                writer = csv.DictWriter(extraction_log, fieldnames=fieldnames)
+                writer.writerow({'date':today, 'de_ids':de_ids, 'ou_ids':ou_ids, 'periods':periods, 'comment':comment})
         return data
 
     def label_org_unit_structure(self):
