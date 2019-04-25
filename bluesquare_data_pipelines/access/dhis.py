@@ -41,7 +41,7 @@ class dhis_instance(object):
 
     def dhis_connect(self, credentials):
         fromPath = Path.home() / '.credentials'
-        env_path = (fromPath / ("dhis2_cd_hivdr_prod")).resolve()
+        env_path = (fromPath / (credentials)).resolve()
         loaded = dotenv_values(dotenv_path=str(env_path))
         connecting = "dbname='" + loaded["dbname"] + "' user='" + loaded["user"] + "' host='" + loaded["host"] + "' password='" + loaded["password"] + "'"
         try:
