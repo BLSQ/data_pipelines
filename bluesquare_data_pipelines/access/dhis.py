@@ -26,18 +26,24 @@ class dhis_instance(object):
     def __init__(self, credentials):
         """Create a dhis instance."""
         self.dhis_connect(credentials)
+        print("Getting Orgunits")
         self.organisationunit = pd.read_sql_query("SELECT organisationunitid, uid, name, path FROM organisationunit;",
                                                   self.connexion)
+        print("Getting Data Elements")
         self.dataelement = pd.read_sql_query("SELECT uid, name, dataelementid, categorycomboid FROM dataelement;", self.connexion)
         self.dataelement.name = self.dataelement.name.str.replace("\n|\r", " ")
+        print("Getting Data Element Groups")
         self.dataelementgroup = pd.read_sql_query("SELECT uid, name, dataelementgroupid FROM dataelementgroup;", self.connexion)
         self.dataelementgroupmembers = pd.read_sql_query("SELECT dataelementid, dataelementgroupid FROM dataelementgroupmembers;", self.connexion)
+        print("Getting Orgunits Pyramid")
         self.orgunitstructure = pd.read_sql_query("SELECT organisationunituid, level, uidlevel1, uidlevel2, uidlevel3, uidlevel4, uidlevel5 FROM _orgunitstructure;", self.connexion)
+        self.label_org_unit_structure()
+        print("Getting Category Option Combos")
         self.categoryoptioncombo = pd.read_sql_query("SELECT categoryoptioncomboid, name , uid FROM categoryoptioncombo;", self.connexion)
         self.categorycombos_optioncombos = pd.read_sql_query("SELECT *  FROM categorycombos_optioncombos;", self.connexion)
+        print("Getting Periods")
         self.periods = pd.read_sql_query("SELECT *  FROM _periodstructure;",
                                          self.connexion)
-        self.label_org_unit_structure()
 
     def dhis_connect(self, credentials):
         fromPath = Path.home() / '.credentials'
@@ -46,6 +52,7 @@ class dhis_instance(object):
         connecting = "dbname='" + loaded["dbname"] + "' user='" + loaded["user"] + "' host='" + loaded["host"] + "' password='" + loaded["password"] + "'"
         try:
             self.connexion = pypg.connect(connecting)
+            print("Connected we are")
         except:
             print("Failed connection")
 
