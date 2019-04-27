@@ -106,11 +106,10 @@ class dhis_instance(object):
             period_query =  " AND datavalue.periodid IN " + "('" + "','".join(periods) + "')"
             query = query + period_query
         data = pd.read_sql_query(query + ";", self.connexion)
-        log = [today, de_ids, ou_ids, periods]
         with open('data/logs/extraction_log.csv', 'a+', newline='') as extraction_log:
                 fieldnames = ['date','de_ids', 'ou_ids', 'periods', 'comment']
                 writer = csv.DictWriter(extraction_log, fieldnames=fieldnames)
-                writer.writerow({'date':today, 'de_ids':de_ids, 'ou_ids':ou_ids, 'periods':periods, 'comment':comment})
+                writer.writerow({'date':today, 'de_ids':de_ids, 'ou_ids':ou_ids, 'periods':periods, 'comment':comment})     
         return data
 
     def label_org_unit_structure(self):
