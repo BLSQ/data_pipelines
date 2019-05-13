@@ -64,7 +64,7 @@ class dhis_instance(object):
             query = f"""
                 SELECT datavalue.periodid, datavalue.dataelementid, _orgunitstructure.{hierachical_level}, 
                 count(datavalue) FROM datavalue JOIN _orgunitstructure ON _orgunitstructure.organisationunitid = datavalue.sourceid
-                GROUP BY _orgunitstructure.uid{hierachical_level},, datavalue.periodid, datavalue.dataelementid;
+                GROUP BY _orgunitstructure.uid{hierachical_level}, datavalue.periodid, datavalue.dataelementid;
             """
 
             reported_de = pd.read_sql_query(query,
@@ -107,10 +107,10 @@ class dhis_instance(object):
             query = query + period_query
         data = pd.read_sql_query(query + ";", self.connexion)
         log = [today, de_ids, ou_ids, periods]
-        with open('data/logs/extraction_log.csv', 'a+', newline='') as extraction_log:
-                fieldnames = ['date','de_ids', 'ou_ids', 'periods', 'comment']
-                writer = csv.DictWriter(extraction_log, fieldnames=fieldnames)
-                writer.writerow({'date':today, 'de_ids':de_ids, 'ou_ids':ou_ids, 'periods':periods, 'comment':comment})
+       # with open('data/logs/extraction_log.csv', 'a+', newline='') as extraction_log:
+               # fieldnames = ['date','de_ids', 'ou_ids', 'periods', 'comment']
+               # writer = csv.DictWriter(extraction_log, fieldnames=fieldnames)
+               # writer.writerow({'date':today, 'de_ids':de_ids, 'ou_ids':ou_ids, 'periods':periods, 'comment':comment})
         return data
 
     def label_org_unit_structure(self):
@@ -131,14 +131,14 @@ class dhis_instance(object):
         self.orgunitstructure = self.orgunitstructure[['organisationunituid', 'level'] + uids + ['namelevel'+x[-1] for x in uids]]
 
     def impute_zero_dataelementname(df):
-    
-    """ This function is used to populate a pandas dfs with rows for each data element and zero imputed value
-    where at least one value for fosa x period x data element exists in the data.
-    
-    :param df: This is a pandas df that has rows only for manually inputed data element.
-    
-    :return: out: This function returns a pandas df augmented with extra rows for every existing data element.
-    """
+        
+        """ This function is used to populate a pandas dfs with rows for each data element and zero imputed value
+        where at least one value for fosa x period x data element exists in the data.
+        
+        :param df: This is a pandas df that has rows only for manually inputed data element.
+        
+        :return: out: This function returns a pandas df augmented with extra rows for every existing data element.
+        """
     
         import pandas as pd
         
