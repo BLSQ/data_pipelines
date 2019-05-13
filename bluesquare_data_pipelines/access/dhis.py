@@ -41,9 +41,8 @@ class dhis_instance(object):
 
     def dhis_connect(self, credentials):
         fromPath = Path.home() / '.credentials'
-        env_path = (fromPath / (credentials)).resolve()
-        loaded = dotenv_values(dotenv_path=str(env_path))
-        connecting = "dbname='" + loaded["dbname"] + "' user='" + loaded["user"] + "' host='" + loaded["host"] + "' password='" + loaded["password"] + "'"
+        loaded = dotenv_values(dotenv_path=str(fromPath.resolve()))
+        connecting = "dbname='" + loaded["RDS_DB_NAME"] + "' user='" + loaded["RDS_USERNAME"]  + "' password='" + loaded["RDS_PASSWORD"] + "'"
         try:
             self.connexion = pypg.connect(connecting)
         except:
@@ -57,33 +56,41 @@ class dhis_instance(object):
         de_catecombos_options_full = de_catecombos_options.merge(self.categoryoptioncombo, on='categoryoptioncomboid', suffixes=['_de', '_cc'])
         return de_catecombos_options_full
 
-    def get_reported_de(self):
-        # TODO : allow tailored reported values extraction
-        """Get the amount of data reported for each data elements, aggregated at Level 3 level."""
-        reported_de = pd.read_sql_query("SELECT datavalue.periodid, datavalue.dataelementid, _orgunitstructure.uidlevel3, count(datavalue) FROM datavalue JOIN _orgunitstructure ON _orgunitstructure.organisationunitid = datavalue.sourceid GROUP BY _orgunitstructure.uidlevel3, datavalue.periodid, datavalue.dataelementid;",
-                                        self.connexion)
-        reported_de = reported_de.merge(self.organisationunit,
-                                        left_on='uidlevel3', right_on='uid',
-                                        how='inner')
-        reported_de = reported_de.merge(self.dataelement, 
-                                        left_on='dataelementid',
-                                        right_on='dataelementid',
-                                        suffixes=['_orgUnit', '_data_element'])
-        reported_de = reported_de.merge(self.periods)
-        reported_de = reported_de.merge(self.orgunitstructure,
-                                        left_on='uidlevel3',
-                                        right_on='organisationunituid')
-        reported_de = reported_de[['quarterly', 'monthly',
+    def get_reported_de(self, level = 'uidlevel3'):
+            # TODO : allow tailored reported values extraction
+            """Get the amount of data reported for each data elements, aggregated at Level 3 level."""
+            hierachical_level = (level) # this has to be a tuple
+
+            query = f"""
+                SELECT datavalue.periodid, datavalue.dataelementid, _orgunitstructure.{hierachical_level}, 
+                count(datavalue) FROM datavalue JOIN _orgunitstructure ON _orgunitstructure.organisationunitid = datavalue.sourceid
+                GROUP BY _orgunitstructure.uid{hierachical_level},, datavalue.periodid, datavalue.dataelementid;
+            """
+
+            reported_de = pd.read_sql_query(query,
+                                            self.connexion)
+            reported_de = reported_de.merge(self.organisationunit,
+                                            left_on='uidlevel3', right_on='uid',
+                                            how='inner')
+            reported_de = reported_de.merge(self.dataelement, 
+                                            left_on='dataelementid',
+                                            right_on='dataelementid',
+                                            suffixes=['_orgUnit', '_data_element'])
+            reported_de = reported_de.merge(self.periods)
+            reported_de = reported_de.merge(self.orgunitstructure,
+                                            left_on='uidlevel3',
+                                            right_on='organisationunituid')
+            reported_de = reported_de[['quarterly', 'monthly',
+                                       'uidlevel2', 'namelevel2',
+                                       'uidlevel3_x', 'namelevel3',
+                                       'count',
+                                       'uid_data_element', 'name_data_element']]
+            reported_de.columns = ['quarterly', 'monthly',
                                    'uidlevel2', 'namelevel2',
-                                   'uidlevel3_x', 'namelevel3',
+                                   'uidlevel3', 'namelevel3',
                                    'count',
-                                   'uid_data_element', 'name_data_element']]
-        reported_de.columns = ['quarterly', 'monthly',
-                               'uidlevel2', 'namelevel2',
-                               'uidlevel3', 'namelevel3',
-                               'count',
-                               'uid_data_element', 'name_data_element']
-        return reported_de
+                                   'uid_data_element', 'name_data_element']
+            return reported_de
         
     def get_data(self, de_ids, ou_ids, yearly=None, comment = ""):
         # TODO : allow tailored reported values extraction
@@ -122,3 +129,37 @@ class dhis_instance(object):
                                                                 left_on=uid,
                                                                 right_on='uid')
         self.orgunitstructure = self.orgunitstructure[['organisationunituid', 'level'] + uids + ['namelevel'+x[-1] for x in uids]]
+
+    def impute_zero_dataelementname(df):
+    
+    """ This function is used to populate a pandas dfs with rows for each data element and zero imputed value
+    where at least one value for fosa x period x data element exists in the data.
+    
+    :param df: This is a pandas df that has rows only for manually inputed data element.
+    
+    :return: out: This function returns a pandas df augmented with extra rows for every existing data element.
+    """
+    
+        import pandas as pd
+        
+        out = []
+        
+        list_fosa = df.fosa.unique()
+        
+        for fosa in list_fosa:
+            sub_df = df[df.fosa == fosa]
+            # first, drop duplicates in month x data element, then create a contigency table month x dataelement
+            sub_df_piv = sub_df.drop_duplicates(subset=["monthly","dataelementname"], keep='last').pivot(index="monthly", columns="dataelementname", values=["value"])
+            # second, stacked the values to go back to a df format with one row per month and data element
+            # we replace NAs by 0, as we think that if a report was filled out, the missing values are really zeros
+            sub_df_piv_stacked = sub_df_piv.fillna(0).stack()
+            sub_df_piv_stacked = pd.DataFrame(sub_df_piv_stacked)
+            sub_df_piv_stacked = sub_df_piv_stacked.reset_index()
+            # finally, we merged it back with the original data frame
+            sub_df_col = sub_df[["province","fosa","monthly","quarterly"]]
+            new_df = sub_df_col.merge(sub_df_piv_stacked, 'outer')
+            
+            out.append(new_df)
+        # return the transformed data frame
+        df_augmented = pd.concat(out)
+        return(df_augmented)
