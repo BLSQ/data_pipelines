@@ -56,9 +56,9 @@ class dhis_instance(object):
         de_catecombos_options_full = de_catecombos_options.merge(self.categoryoptioncombo, on='categoryoptioncomboid', suffixes=['_de', '_cc'])
         return de_catecombos_options_full
 
-    def get_reported_de(self, level = 'uidlevel3'):
-            # TODO : allow tailored reported values extraction
-            """Get the amount of data reported for each data elements, aggregated at Level 3 level."""
+    def get_reported_de(self, level = 'uidlevel3', period1 = 'quarterly', period2='monthly'):
+             """Get the amount of data reported for each data elements, aggregated at Level of choice -
+            default is level 3, and periods of choice - defaults are quarterly and monthly."""
             hierachical_level = (level) # this has to be a tuple
 
             query = f"""
@@ -80,12 +80,12 @@ class dhis_instance(object):
             reported_de = reported_de.merge(self.orgunitstructure,
                                             left_on='uidlevel3',
                                             right_on='organisationunituid')
-            reported_de = reported_de[['quarterly', 'monthly',
+            reported_de = reported_de[[period1, period2,
                                        'uidlevel2', 'namelevel2',
                                        'uidlevel3_x', 'namelevel3',
                                        'count',
                                        'uid_data_element', 'name_data_element']]
-            reported_de.columns = ['quarterly', 'monthly',
+            reported_de.columns = [period1, period2,
                                    'uidlevel2', 'namelevel2',
                                    'uidlevel3', 'namelevel3',
                                    'count',
