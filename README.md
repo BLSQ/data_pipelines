@@ -5,7 +5,7 @@ The data pipelines are the generic data transformation and modeling tools we dev
 ## Installation
 
 ```
-pip install + git+https://github.com/BLSQ/data_pipelines
+pip install git+https://github.com/BLSQ/data_pipelines
 ```
 
 ## Content
