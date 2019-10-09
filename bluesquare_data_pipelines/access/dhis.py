@@ -5,6 +5,8 @@ from pathlib import Path
 from dotenv import dotenv_values
 import datetime as dt
 import csv as csv
+import geopandas as gpd
+import numpy as np
 
 class dhis_instance(object):
     """Information and metadata about a given DHIS instance.
@@ -27,7 +29,7 @@ class dhis_instance(object):
         """Create a dhis instance."""
         self.dhis_connect(credentials)
         print("Getting Orgunits")
-        self.organisationunit = pd.read_sql_query("SELECT organisationunitid, uid, name, path FROM organisationunit;",
+        self.organisationunit = pd.read_sql_query("SELECT organisationunitid, uid, name, path, coordinates FROM organisationunit;",
                                                   self.connexion)
         print("Getting Data Elements")
         self.dataelement = pd.read_sql_query("SELECT uid, name, dataelementid, categorycomboid FROM dataelement;", self.connexion)
@@ -128,3 +130,18 @@ class dhis_instance(object):
                                                                 left_on=uid,
                                                                 right_on='uid')
         self.orgunitstructure = self.orgunitstructure[['organisationunituid', 'level'] + uids + ['namelevel'+x[-1] for x in uids]]
+    
+    def get_geodataframe(self, level, type, structure=True):
+        level_fosa = self.orgunitstructure.loc[self.orgunitstructure.level == level, "organisationunituid"]
+        level_data = self.organisationunit[self.organisationunit.uid.isin(level_fosa)]
+        if type == "point":
+            level_data.loc[:,"coordinates"] = level_data.coordinates.astype(str)
+            level_data.loc[:,"lat"] = level_data.loc[:,"coordinates"].str.split("\[|\]|,").apply(lambda x: float(x[1]) if len(x) == 4 else np.nan)
+            level_data.loc[:,"lon"] = level_data.loc[:,"coordinates"].str.split("\[|\]|,").apply(lambda x: float(x[2]) if len(x) == 4 else np.nan)
+        if structure == True :
+            hierarchy = self.orgunitstructure[self.orgunitstructure.level == level]
+            level_data = level_data.merge(hierarchy, left_on="uid", right_on="organisationunituid")
+        geodataframe = gpd.GeoDataFrame(level_data,
+                             geometry=gpd.points_from_xy(level_data.lat,
+                                                         level_data.lon),crs={'init':'epsg:4326'})
+        return geodataframe
