@@ -10,6 +10,7 @@ bluesquare_data_pipelines.egg-info/requires.txt
 bluesquare_data_pipelines.egg-info/top_level.txt
 bluesquare_data_pipelines/access/__init__.py
 bluesquare_data_pipelines/access/dhis.py
+bluesquare_data_pipelines/access/geodata_process.py
 bluesquare_data_pipelines/analysis/__init__.py
 bluesquare_data_pipelines/processing/__init__.py
 bluesquare_data_pipelines/processing/data_process.py
