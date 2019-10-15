@@ -14,14 +14,14 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/BLSQ/data_pipelines",
     packages=["bluesquare_data_pipelines", "bluesquare_data_pipelines.access"],
+    install_requires=[
+          'markdown',
+      ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    install_requires=[
-          'dotenv',
-      ]
 )
 
 #%%
