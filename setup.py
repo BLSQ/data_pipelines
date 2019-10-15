@@ -15,7 +15,7 @@ setuptools.setup(
     url="https://github.com/BLSQ/data_pipelines",
     packages=["bluesquare_data_pipelines", "bluesquare_data_pipelines.access"],
     install_requires=[
-          'markdown',
+          'dotenv',
       ],
     classifiers=[
         "Programming Language :: Python :: 3",
