@@ -6,7 +6,6 @@ bluesquare_data_pipelines/__init__.py
 bluesquare_data_pipelines.egg-info/PKG-INFO
 bluesquare_data_pipelines.egg-info/SOURCES.txt
 bluesquare_data_pipelines.egg-info/dependency_links.txt
-bluesquare_data_pipelines.egg-info/requires.txt
 bluesquare_data_pipelines.egg-info/top_level.txt
 bluesquare_data_pipelines/access/__init__.py
 bluesquare_data_pipelines/access/dhis.py
