@@ -13,7 +13,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/BLSQ/data_pipelines",
-    packages=["bluesquare_data_pipelines", "bluesquare_data_pipelines.access"],
+    packages=["bluesquare_data_pipelines", "bluesquare_data_pipelines.access", "bluesquare_data_pipelines.geodata_process"],
     install_requires=[
           'python-dotenv',
       ],
