@@ -2,6 +2,7 @@
 import geopandas as gpd
 import numpy as np
 from shapely.geometry import LineString, Polygon, Point
+import pandas as pd
 
 def dhis_to_GeoDataFrame(dhis2_orgunits_table, level, type_shape):
         level_data = dhis2_orgunits_table[dhis2_orgunits_table.level == level]
