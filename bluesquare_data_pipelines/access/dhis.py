@@ -58,6 +58,14 @@ class dhis_instance(object):
         except:
             print("Failed connection")
 
+    def sql_read(self, sql_script, how="file"):
+        if how == "file":
+            query = open(sql_script, 'r')
+            out = pd.read_sql_query(query.read(), self.connexion)
+        if how == "str":
+            out = pd.read_sql_query(sql_script, self.connexion)
+        return out
+
     def build_de_cc_table(self):
         """Build table in which category combos are linked to data elements."""
         # First associate data elements to their category combos
